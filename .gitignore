@@ -4,3 +4,16 @@
 *.jar
 *.war
 *.ear
+
+.project
+.classpath
+.settings
+*.iml
+*.ipr
+*.iws
+.idea/
+.geany
+/target
+*/target
+/reports
+*/reports
