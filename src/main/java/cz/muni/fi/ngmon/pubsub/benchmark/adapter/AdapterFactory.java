@@ -15,10 +15,11 @@ import cz.muni.fi.ngmon.pubsub.benchmark.adapter.matchingtree.EventAdapter;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.matchingtree.FilterAdapter;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.matchingtree.MatchingTreeAdapter;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.matchingtree.PredicateAdapter;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena.SienaTable;
 
 public class AdapterFactory {
 
-	private static final DataStructures dataStructure = DataStructures.COUNTING_TREE;
+	private static final DataStructures dataStructure = DataStructures.SIENA;
 
 	public static <T1 extends Comparable<T1>> AttributeValue<T1> createAttributeValue(
 			T1 value, Class<T1> type) {
@@ -27,6 +28,9 @@ public class AdapterFactory {
 			return new AttributeValueAdapter<T1>(value, type);
 		case COUNTING_TREE:
 			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.AttributeValueAdapter<T1>(
+					value, type);
+		case SIENA:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena.AttributeValueAdapter<T1>(
 					value, type);
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
@@ -40,6 +44,9 @@ public class AdapterFactory {
 			return new AttributeAdapter<T1>(name, value);
 		case COUNTING_TREE:
 			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.AttributeAdapter<T1>(
+					name, value);
+		case SIENA:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena.AttributeAdapter<T1>(
 					name, value);
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
@@ -56,6 +63,9 @@ public class AdapterFactory {
 		case COUNTING_TREE:
 			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.ConstraintAdapter<>(
 					attributeName, attributeValue, operator);
+		case SIENA:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena.ConstraintAdapter<T1>(
+					attributeName, attributeValue, operator);
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -67,6 +77,8 @@ public class AdapterFactory {
 			return new PredicateAdapter();
 		case COUNTING_TREE:
 			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.PredicateAdapter();
+		case SIENA:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena.PredicateAdapter();
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -78,6 +90,8 @@ public class AdapterFactory {
 			return new EventAdapter();
 		case COUNTING_TREE:
 			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.EventAdapter();
+		case SIENA:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena.EventAdapter();
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -89,6 +103,8 @@ public class AdapterFactory {
 			return new MatchingTreeAdapter();
 		case COUNTING_TREE:
 			return new CountingTreeAdapter();
+		case SIENA:
+			return new SienaTable();
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -100,6 +116,8 @@ public class AdapterFactory {
 			return new FilterAdapter();
 		case COUNTING_TREE:
 			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.FilterAdapter();
+		case SIENA:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena.FilterAdapter();
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}

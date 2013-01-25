@@ -1,4 +1,4 @@
-package cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree;
+package cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena;
 
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Attribute;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.AttributeValue;
@@ -6,16 +6,21 @@ import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.AttributeValue;
 public class AttributeAdapter<T1 extends Comparable<T1>> implements
 		Attribute<T1> {
 
-	private cz.muni.fi.publishsubscribe.countingtree.Attribute<T1> countingTreeAttribute;
+	private String name;
+	private AttributeValue<T1> value;
 
 	public AttributeAdapter(String name, AttributeValue<T1> value) {
-		countingTreeAttribute = new cz.muni.fi.publishsubscribe.countingtree.Attribute<T1>(
-				name, value.getCountingTreeAttributeValue());
+		this.name = name;
+		this.value = value;
 	}
 
 	@Override
 	public String getName() {
-		return countingTreeAttribute.getName();
+		return name;
+	}
+
+	public AttributeValue<T1> getValue() {
+		return value;
 	}
 
 	@Override
@@ -25,11 +30,6 @@ public class AttributeAdapter<T1 extends Comparable<T1>> implements
 
 	@Override
 	public cz.muni.fi.publishsubscribe.countingtree.Attribute<T1> getCountingTreeAttribute() {
-		return countingTreeAttribute;
-	}
-	
-	@Override
-	public AttributeValue<T1> getValue() {
 		throw new UnsupportedOperationException();
 	}
 

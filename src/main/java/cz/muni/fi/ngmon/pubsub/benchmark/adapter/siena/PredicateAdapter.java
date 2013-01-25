@@ -1,17 +1,15 @@
-package cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree;
+package cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena;
 
 import siena.FilterList;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Filter;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Predicate;
 import cz.muni.fi.publishsubscribe.matchingtree.Subscription;
 
-public class PredicateAdapter implements Predicate {
-
-	private cz.muni.fi.publishsubscribe.countingtree.Predicate countingTreePredicate = new cz.muni.fi.publishsubscribe.countingtree.Predicate();
+public class PredicateAdapter extends FilterList implements Predicate {
 
 	@Override
 	public void addFilter(Filter filter) {
-		countingTreePredicate.addFilter(filter.getCountingTreeFilter());
+		super.add(filter.getSienaFilter());
 	}
 
 	@Override
@@ -21,12 +19,12 @@ public class PredicateAdapter implements Predicate {
 
 	@Override
 	public cz.muni.fi.publishsubscribe.countingtree.Predicate getCountingTreePredicate() {
-		return countingTreePredicate;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public FilterList getSienaFilterList() {
-		throw new UnsupportedOperationException();
+		return this;
 	}
 
 }

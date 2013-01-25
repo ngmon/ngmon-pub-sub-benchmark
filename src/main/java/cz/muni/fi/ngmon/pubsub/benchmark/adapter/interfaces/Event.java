@@ -6,5 +6,6 @@ public interface Event {
 	
 	public cz.muni.fi.publishsubscribe.matchingtree.Event getMatchingTreeEvent();
 	public cz.muni.fi.publishsubscribe.countingtree.Event getCountingTreeEvent();
+	public siena.Notification getSienaNotification();
 
 }

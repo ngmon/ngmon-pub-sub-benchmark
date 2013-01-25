@@ -2,6 +2,8 @@ package cz.muni.fi.ngmon.pubsub.benchmark.adapter.matchingtree;
 
 import java.util.List;
 
+import siena.FilterList;
+
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Constraint;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Filter;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Predicate;
@@ -32,6 +34,11 @@ public class PredicateAdapter implements Predicate {
 
 	@Override
 	public cz.muni.fi.publishsubscribe.countingtree.Predicate getCountingTreePredicate() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public FilterList getSienaFilterList() {
 		throw new UnsupportedOperationException();
 	}
 

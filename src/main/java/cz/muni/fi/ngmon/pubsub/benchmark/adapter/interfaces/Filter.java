@@ -9,5 +9,6 @@ public interface Filter {
 
 	public List<Constraint<? extends Comparable<?>>> getConstraints();
 	public cz.muni.fi.publishsubscribe.countingtree.Filter getCountingTreeFilter();
+	public siena.Filter getSienaFilter();
 
 }

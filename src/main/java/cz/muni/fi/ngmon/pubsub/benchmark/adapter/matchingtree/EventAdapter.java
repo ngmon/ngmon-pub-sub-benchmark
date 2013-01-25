@@ -1,5 +1,6 @@
 package cz.muni.fi.ngmon.pubsub.benchmark.adapter.matchingtree;
 
+import siena.Notification;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Attribute;
 import cz.muni.fi.publishsubscribe.matchingtree.Event;
 
@@ -18,6 +19,11 @@ public class EventAdapter extends Event implements
 
 	@Override
 	public cz.muni.fi.publishsubscribe.countingtree.Event getCountingTreeEvent() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Notification getSienaNotification() {
 		throw new UnsupportedOperationException();
 	}
 

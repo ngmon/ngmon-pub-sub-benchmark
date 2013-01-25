@@ -26,4 +26,9 @@ public class FilterAdapter implements Filter {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public siena.Filter getSienaFilter() {
+		throw new UnsupportedOperationException();
+	}
+
 }

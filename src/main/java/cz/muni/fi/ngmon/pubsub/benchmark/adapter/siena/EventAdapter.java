@@ -1,15 +1,17 @@
-package cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree;
+package cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena;
 
 import siena.Notification;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Attribute;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Event;
 
-public class EventAdapter extends
-		cz.muni.fi.publishsubscribe.countingtree.Event implements Event {
+public class EventAdapter extends siena.Notification implements Event {
+
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public void addAttribute(Attribute<? extends Comparable<?>> attribute) {
-		super.addAttribute(attribute.getCountingTreeAttribute());
+		super.putAttribute(attribute.getName(), attribute.getValue()
+				.getSienaAttributeValue());
 	}
 
 	@Override
@@ -19,12 +21,12 @@ public class EventAdapter extends
 
 	@Override
 	public cz.muni.fi.publishsubscribe.countingtree.Event getCountingTreeEvent() {
-		return this;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Notification getSienaNotification() {
-		throw new UnsupportedOperationException();
+		return this;
 	}
 
 }

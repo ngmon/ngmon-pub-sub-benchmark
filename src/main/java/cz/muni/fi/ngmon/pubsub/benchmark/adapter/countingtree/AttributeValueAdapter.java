@@ -32,4 +32,9 @@ public class AttributeValueAdapter<T1 extends Comparable<T1>> implements
 		return countingTreeAttributeValue;
 	}
 
+	@Override
+	public siena.AttributeValue getSienaAttributeValue() {
+		throw new UnsupportedOperationException();
+	}
+
 }

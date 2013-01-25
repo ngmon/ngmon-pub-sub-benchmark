@@ -1,19 +1,20 @@
-package cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree;
+package cz.muni.fi.ngmon.pubsub.benchmark.adapter.siena;
 
 import java.util.List;
 
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Constraint;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Filter;
 
-public class FilterAdapter implements Filter {
+public class FilterAdapter extends siena.Filter implements Filter {
 
-	private cz.muni.fi.publishsubscribe.countingtree.Filter countingTreeFilter = new cz.muni.fi.publishsubscribe.countingtree.Filter();
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public <T1 extends Comparable<T1>, T2 extends Constraint<T1>> boolean addConstraint(
 			T2 constraint) {
-		return countingTreeFilter.addConstraint(constraint
-				.getCountingTreeConstraint());
+		super.addConstraint(constraint.getAttributeName(),
+				constraint.getSienaAttributeConstraint());
+		return true;
 	}
 
 	@Override
@@ -23,12 +24,12 @@ public class FilterAdapter implements Filter {
 
 	@Override
 	public cz.muni.fi.publishsubscribe.countingtree.Filter getCountingTreeFilter() {
-		return countingTreeFilter;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public siena.Filter getSienaFilter() {
-		throw new UnsupportedOperationException();
+		return this;
 	}
 
 }

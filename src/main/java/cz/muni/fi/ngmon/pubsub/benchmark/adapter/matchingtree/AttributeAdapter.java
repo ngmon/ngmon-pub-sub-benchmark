@@ -28,4 +28,9 @@ public class AttributeAdapter<T1 extends Comparable<T1>> implements
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public AttributeValue<T1> getValue() {
+		throw new UnsupportedOperationException();
+	}
+
 }

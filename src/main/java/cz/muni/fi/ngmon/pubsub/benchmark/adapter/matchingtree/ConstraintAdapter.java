@@ -1,5 +1,6 @@
 package cz.muni.fi.ngmon.pubsub.benchmark.adapter.matchingtree;
 
+import siena.AttributeConstraint;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.Operator;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.AttributeValue;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Constraint;
@@ -76,6 +77,16 @@ public class ConstraintAdapter<T1 extends Comparable<T1>> implements
 
 	@Override
 	public cz.muni.fi.publishsubscribe.countingtree.Constraint<T1> getCountingTreeConstraint() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public AttributeConstraint getSienaAttributeConstraint() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getAttributeName() {
 		throw new UnsupportedOperationException();
 	}
 
