@@ -16,4 +16,9 @@ public class EventAdapter extends Event implements
 		return this;
 	}
 
+	@Override
+	public cz.muni.fi.publishsubscribe.countingtree.Event getCountingTreeEvent() {
+		throw new UnsupportedOperationException();
+	}
+
 }

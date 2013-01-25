@@ -69,8 +69,14 @@ public class ConstraintAdapter<T1 extends Comparable<T1>> implements
 		}
 	}
 
+	@Override
 	public Predicate<? extends Comparable<?>, ? extends Comparable<?>> getMatchingTreePredicate() {
 		return predicate;
+	}
+
+	@Override
+	public cz.muni.fi.publishsubscribe.countingtree.Constraint<T1> getCountingTreeConstraint() {
+		throw new UnsupportedOperationException();
 	}
 
 }

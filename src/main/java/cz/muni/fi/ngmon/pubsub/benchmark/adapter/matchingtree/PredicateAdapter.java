@@ -30,4 +30,9 @@ public class PredicateAdapter implements Predicate {
 		return matchingTreeSubscription;
 	}
 
+	@Override
+	public cz.muni.fi.publishsubscribe.countingtree.Predicate getCountingTreePredicate() {
+		throw new UnsupportedOperationException();
+	}
+
 }

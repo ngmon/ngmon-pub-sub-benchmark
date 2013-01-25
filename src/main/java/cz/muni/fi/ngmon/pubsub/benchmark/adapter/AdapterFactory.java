@@ -1,5 +1,6 @@
 package cz.muni.fi.ngmon.pubsub.benchmark.adapter;
 
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.CountingTreeAdapter;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Attribute;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.AttributeValue;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Constraint;
@@ -17,13 +18,16 @@ import cz.muni.fi.ngmon.pubsub.benchmark.adapter.matchingtree.PredicateAdapter;
 
 public class AdapterFactory {
 
-	private static final DataStructures dataStructure = DataStructures.MATCHING_TREE;
+	private static final DataStructures dataStructure = DataStructures.COUNTING_TREE;
 
 	public static <T1 extends Comparable<T1>> AttributeValue<T1> createAttributeValue(
 			T1 value, Class<T1> type) {
 		switch (dataStructure) {
 		case MATCHING_TREE:
 			return new AttributeValueAdapter<T1>(value, type);
+		case COUNTING_TREE:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.AttributeValueAdapter<T1>(
+					value, type);
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -34,6 +38,9 @@ public class AdapterFactory {
 		switch (dataStructure) {
 		case MATCHING_TREE:
 			return new AttributeAdapter<T1>(name, value);
+		case COUNTING_TREE:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.AttributeAdapter<T1>(
+					name, value);
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -46,6 +53,9 @@ public class AdapterFactory {
 		case MATCHING_TREE:
 			return new ConstraintAdapter<T1>(attributeName, attributeValue,
 					operator);
+		case COUNTING_TREE:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.ConstraintAdapter<>(
+					attributeName, attributeValue, operator);
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -55,6 +65,8 @@ public class AdapterFactory {
 		switch (dataStructure) {
 		case MATCHING_TREE:
 			return new PredicateAdapter();
+		case COUNTING_TREE:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.PredicateAdapter();
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -64,6 +76,8 @@ public class AdapterFactory {
 		switch (dataStructure) {
 		case MATCHING_TREE:
 			return new EventAdapter();
+		case COUNTING_TREE:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.EventAdapter();
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -73,6 +87,8 @@ public class AdapterFactory {
 		switch (dataStructure) {
 		case MATCHING_TREE:
 			return new MatchingTreeAdapter();
+		case COUNTING_TREE:
+			return new CountingTreeAdapter();
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}
@@ -82,6 +98,8 @@ public class AdapterFactory {
 		switch (dataStructure) {
 		case MATCHING_TREE:
 			return new FilterAdapter();
+		case COUNTING_TREE:
+			return new cz.muni.fi.ngmon.pubsub.benchmark.adapter.countingtree.FilterAdapter();
 		default:
 			throw new UnsupportedOperationException("not yet implemented");
 		}

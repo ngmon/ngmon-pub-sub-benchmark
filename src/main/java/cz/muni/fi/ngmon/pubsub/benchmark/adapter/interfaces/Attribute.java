@@ -5,5 +5,6 @@ public interface Attribute<T1 extends Comparable<T1>> {
 	public String getName();
 	
 	public cz.muni.fi.publishsubscribe.matchingtree.Attribute<T1> getMatchingTreeAttribute();
+	public cz.muni.fi.publishsubscribe.countingtree.Attribute<T1> getCountingTreeAttribute();
 
 }

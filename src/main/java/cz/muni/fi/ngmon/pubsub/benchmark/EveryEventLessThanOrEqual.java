@@ -2,6 +2,9 @@ package cz.muni.fi.ngmon.pubsub.benchmark;
 
 import com.google.caliper.SimpleBenchmark;
 
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.AdapterFactory;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.PublishSubscribeTree;
+
 /**
  * The simplest benchmark possible - only one attribute (of type Long),
  * 4 possible values, Operator.LESS_THAN_OR_EQUAL_TO,
@@ -16,13 +19,13 @@ public class EveryEventLessThanOrEqual extends SimpleBenchmark {
 	private static final long LONG_MIN_VALUE = 0L;
 	private static final long LONG_MAX_VALUE = 3L;
 	
-	private CountingTree tree;
+	private PublishSubscribeTree tree;
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		this.tree = new CountingTree();
+		this.tree = AdapterFactory.createPublishSubscribeTree();
 
 		// Less than or equal to a number from 0 to 3
 		Long number = LONG_MIN_VALUE;

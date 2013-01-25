@@ -8,5 +8,6 @@ public interface Filter {
 			T2 constraint);
 
 	public List<Constraint<? extends Comparable<?>>> getConstraints();
+	public cz.muni.fi.publishsubscribe.countingtree.Filter getCountingTreeFilter();
 
 }

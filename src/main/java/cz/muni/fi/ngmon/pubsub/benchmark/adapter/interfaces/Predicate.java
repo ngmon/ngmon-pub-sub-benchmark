@@ -7,5 +7,6 @@ public interface Predicate {
 	public void addFilter(Filter filter);
 	
 	public Subscription getMatchingTreeSubscription();
+	public cz.muni.fi.publishsubscribe.countingtree.Predicate getCountingTreePredicate();
 
 }
