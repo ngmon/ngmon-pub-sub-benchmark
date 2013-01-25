@@ -2,7 +2,9 @@ ngmon-pub-sub-benchmark
 =======================
 
 Installing Siena to local Maven repo:
+
 1. Download Siena source package.
+
 2. Add pom.xml with groupId "siena" and artifactId "siena" to the siena directory. For example:
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -38,4 +40,5 @@ Installing Siena to local Maven repo:
 </project>
 
 3. Move src/siena directory to src/main/java/siena.
+
 4. Run "maven package" + "maven install".
