@@ -5,17 +5,21 @@ import java.util.List;
 
 import com.google.caliper.SimpleBenchmark;
 
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.AdapterFactory;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.Operator;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Constraint;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Filter;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Predicate;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.PublishSubscribeTree;
+
 /**
- * Tests the speed of the subscribe() method.
- * The *DifferentPredicate() methods are slow, since each test run
- * adds a lot more subscriptions (the longer the test runs, the more
- * subscriptions there are in the tree).
- * In the *DifferentAttributes() methods the new subscription
- * (predicate) uses different attribute names that those which already
- * are in the tree
- * Every Predicate has one Filter, every Filter has 12 Constraints:
- * 3 Long, less than, 3 Long, greater than or equal to, 3 Long equals
- * and 3 String equals
+ * Tests the speed of the subscribe() method. The *DifferentPredicate() methods
+ * are slow, since each test run adds a lot more subscriptions (the longer the
+ * test runs, the more subscriptions there are in the tree). In the
+ * *DifferentAttributes() methods the new subscription (predicate) uses
+ * different attribute names that those which already are in the tree Every
+ * Predicate has one Filter, every Filter has 12 Constraints: 3 Long, less than,
+ * 3 Long, greater than or equal to, 3 Long equals and 3 String equals
  */
 public class Subscribe extends SimpleBenchmark {
 
@@ -25,9 +29,9 @@ public class Subscribe extends SimpleBenchmark {
 	private Predicate benchmarkPredicate;
 	private Predicate benchmarkPredicateAlt;
 
-	private CountingTree emptyTree;
-	private CountingTree smallTree;
-	private CountingTree largeTree;
+	private PublishSubscribeTree emptyTree;
+	private PublishSubscribeTree smallTree;
+	private PublishSubscribeTree largeTree;
 
 	private Predicate createPredicate(int offset) {
 		return createPredicate(offset, null);
@@ -45,38 +49,45 @@ public class Subscribe extends SimpleBenchmark {
 			}
 		}
 
-		Filter filter = new Filter();
+		Filter filter = AdapterFactory.createFilter();
 		for (int i = 0; i < 3; i++) {
-			Constraint<Long> constraint = new Constraint<>(
-					attributeNames.get(0) + i, new AttributeValue<>((long) (i + 1)
-							* 1000000 + offset, Long.class), Operator.LESS_THAN);
+			Constraint<Long> constraint = AdapterFactory
+					.createConstraint(
+							attributeNames.get(0) + i,
+							AdapterFactory.createAttributeValue((long) (i + 1)
+									* 1000000 + offset, Long.class),
+							Operator.LESS_THAN);
 			filter.addConstraint(constraint);
 		}
 
 		for (int i = 0; i < 3; i++) {
-			Constraint<Long> constraint = new Constraint<>(
-					attributeNames.get(1) + i, new AttributeValue<>((long) (i + 1)
+			Constraint<Long> constraint = AdapterFactory.createConstraint(
+					attributeNames.get(1) + i,
+					AdapterFactory.createAttributeValue((long) (i + 1)
 							* 10000000 + offset, Long.class),
 					Operator.GREATER_THAN_OR_EQUAL_TO);
 			filter.addConstraint(constraint);
 		}
 
 		for (int i = 0; i < 3; i++) {
-			Constraint<Long> constraint = new Constraint<>(
-					attributeNames.get(2) + i, new AttributeValue<>((long) (i + 1)
+			Constraint<Long> constraint = AdapterFactory.createConstraint(
+					attributeNames.get(2) + i,
+					AdapterFactory.createAttributeValue((long) (i + 1)
 							* 100000000 + offset, Long.class), Operator.EQUALS);
 			filter.addConstraint(constraint);
 		}
 
 		for (int i = 0; i < 3; i++) {
-			Constraint<String> constraint = new Constraint<>(
-					attributeNames.get(3) + i, new AttributeValue<>(
-							String.valueOf((i + 1) * 1000000000 + offset),
-							String.class), Operator.EQUALS);
+			Constraint<String> constraint = AdapterFactory.createConstraint(
+					attributeNames.get(3) + i, AdapterFactory
+							.createAttributeValue(
+									String.valueOf((i + 1) * 1000000000
+											+ offset), String.class),
+					Operator.EQUALS);
 			filter.addConstraint(constraint);
 		}
 
-		Predicate predicate = new Predicate();
+		Predicate predicate = AdapterFactory.createPredicate();
 		predicate.addFilter(filter);
 
 		return predicate;
@@ -89,14 +100,14 @@ public class Subscribe extends SimpleBenchmark {
 		this.benchmarkPredicate = createPredicate(0);
 		this.benchmarkPredicateAlt = createPredicate(0, "alt");
 
-		emptyTree = new CountingTree();
+		emptyTree = AdapterFactory.createPublishSubscribeTree();
 
-		smallTree = new CountingTree();
+		smallTree = AdapterFactory.createPublishSubscribeTree();
 		for (int i = 0; i < SMALL_TREE_PREDICATE_COUNT; i++) {
 			smallTree.subscribe(createPredicate(i));
 		}
 
-		largeTree = new CountingTree();
+		largeTree = AdapterFactory.createPublishSubscribeTree();
 		for (int i = 0; i < LARGE_TREE_PREDICATE_COUNT; i++) {
 			largeTree.subscribe(createPredicate(i));
 		}
@@ -119,7 +130,7 @@ public class Subscribe extends SimpleBenchmark {
 			smallTree.subscribe(benchmarkPredicate);
 		}
 	}
-	
+
 	public void timeSubscribeToSmallTreeDifferentPredicate(int reps) {
 		for (int i = 0; i < reps; i++) {
 			smallTree.subscribe(createPredicate(i, "time"));
@@ -143,7 +154,7 @@ public class Subscribe extends SimpleBenchmark {
 			largeTree.subscribe(benchmarkPredicateAlt);
 		}
 	}
-	
+
 	public void timeSubscribeToLargeTreeDifferentPredicate(int reps) {
 		for (int i = 0; i < reps; i++) {
 			largeTree.subscribe(createPredicate(i, "time"));

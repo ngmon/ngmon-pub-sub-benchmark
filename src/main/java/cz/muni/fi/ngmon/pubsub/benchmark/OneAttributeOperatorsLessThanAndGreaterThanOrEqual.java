@@ -5,6 +5,12 @@ import java.util.List;
 
 import com.google.caliper.SimpleBenchmark;
 
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.AdapterFactory;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.Operator;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Constraint;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Event;
+import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.PublishSubscribeTree;
+
 /**
  * One attribute (of type Long), 25 % predicates matched, constraint operators
  * less than and greater than or equal to
@@ -47,11 +53,11 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 	private static final long MATCH_100_VALUE = -50;
 
 	/** Tree for 25 % match ratio */
-	private CountingTree tree25;
+	private PublishSubscribeTree tree25;
 
-	private CountingTree tree50;
-	private CountingTree tree75;
-	private CountingTree tree100;
+	private PublishSubscribeTree tree50;
+	private PublishSubscribeTree tree75;
+	private PublishSubscribeTree tree100;
 
 	private List<Event> eventsFromLessThanMinValueToLessThanMaxValue25;
 	private List<Event> eventsFromGreaterThanOrEqualMinValueToMaxValue25;
@@ -91,19 +97,20 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 		eventsFor50 = prepareEvents(GREATER_THAN_OR_EQUAL_MIN_VALUE_50,
 				GREATER_THAN_OR_EQUAL_MAX_VALUE_EVENTS_50);
 
-		this.tree75 = new CountingTree();
+		this.tree75 = AdapterFactory.createPublishSubscribeTree();
 		int i = 0;
 		while (i < PREDICATE_COUNT / 2) {
 			long constraintValue = i % (LESS_THAN_MAX_VALUE_25_50_75 + 1);
-			Constraint<Long> constraint = new Constraint<Long>(
-					LONG_ATTRIBUTE_NAME, new AttributeValue<Long>(
-							constraintValue - 50, Long.class),
+			Constraint<Long> constraint = AdapterFactory.createConstraint(
+
+			LONG_ATTRIBUTE_NAME, AdapterFactory.createAttributeValue(
+					constraintValue - 50, Long.class),
 					Operator.GREATER_THAN_OR_EQUAL_TO);
 			tree75.subscribe(UtilityMethods
 					.createPredicateFromConstraint(constraint));
-			constraint = new Constraint<Long>(LONG_ATTRIBUTE_NAME,
-					new AttributeValue<Long>(constraintValue, Long.class),
-					Operator.LESS_THAN);
+			constraint = AdapterFactory.createConstraint(LONG_ATTRIBUTE_NAME,
+					AdapterFactory.createAttributeValue(constraintValue,
+							Long.class), Operator.LESS_THAN);
 			tree75.subscribe(UtilityMethods
 					.createPredicateFromConstraint(constraint));
 
@@ -113,19 +120,21 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 		eventsFor75 = prepareEvents(LESS_THAN_MIN_VALUE_25_50_75,
 				GREATER_THAN_OR_EQUAL_MAX_VALUE_75);
 
-		this.tree100 = new CountingTree();
+		this.tree100 = AdapterFactory.createPublishSubscribeTree();
 		i = 0;
 		while (i < PREDICATE_COUNT / 2) {
 			long constraintValue = i % (LESS_THAN_MAX_VALUE_25_50_75 + 1);
-			Constraint<Long> constraint = new Constraint<Long>(
-					LONG_ATTRIBUTE_NAME, new AttributeValue<Long>(
-							constraintValue - 200, Long.class),
+			Constraint<Long> constraint = AdapterFactory.createConstraint(
+
+			LONG_ATTRIBUTE_NAME, AdapterFactory.createAttributeValue(
+
+			constraintValue - 200, Long.class),
 					Operator.GREATER_THAN_OR_EQUAL_TO);
 			tree100.subscribe(UtilityMethods
 					.createPredicateFromConstraint(constraint));
-			constraint = new Constraint<Long>(LONG_ATTRIBUTE_NAME,
-					new AttributeValue<Long>(constraintValue, Long.class),
-					Operator.LESS_THAN);
+			constraint = AdapterFactory.createConstraint(LONG_ATTRIBUTE_NAME,
+					AdapterFactory.createAttributeValue(constraintValue,
+							Long.class), Operator.LESS_THAN);
 			tree100.subscribe(UtilityMethods
 					.createPredicateFromConstraint(constraint));
 
@@ -136,18 +145,21 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 				LESS_THAN_MIN_VALUE_25_50_75);
 	}
 
-	private CountingTree setUpCustomTree(long lessThanMinValue,
+	private PublishSubscribeTree setUpCustomTree(long lessThanMinValue,
 			long lessThanMaxValue, long greaterThanOrEqualMinValue,
 			long greaterThanOrEqualMaxValue) {
-		CountingTree tree = new CountingTree();
+		PublishSubscribeTree tree = AdapterFactory.createPublishSubscribeTree();
 		int i = 0;
 		while (i < PREDICATE_COUNT) {
 			long constraintValue = i % (greaterThanOrEqualMaxValue + 1);
-			Constraint<Long> constraint = new Constraint<Long>(
-					LONG_ATTRIBUTE_NAME,
-					new AttributeValue<Long>(constraintValue, Long.class),
-					constraintValue > lessThanMaxValue ? Operator.GREATER_THAN_OR_EQUAL_TO
-							: Operator.LESS_THAN);
+			Constraint<Long> constraint = AdapterFactory
+					.createConstraint(
+
+							LONG_ATTRIBUTE_NAME,
+							AdapterFactory.createAttributeValue(
+									constraintValue, Long.class),
+							constraintValue > lessThanMaxValue ? Operator.GREATER_THAN_OR_EQUAL_TO
+									: Operator.LESS_THAN);
 			tree.subscribe(UtilityMethods
 					.createPredicateFromConstraint(constraint));
 
@@ -160,9 +172,10 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 	private List<Event> prepareEvents(long minValue, long maxValue) {
 		List<Event> events = new ArrayList<>(EVENT_COUNT);
 		for (long i = 0, value = minValue; i < EVENT_COUNT; i++) {
-			Event event = new Event();
-			event.addAttribute(new Attribute<Long>(LONG_ATTRIBUTE_NAME,
-					new AttributeValue<Long>(value, Long.class)));
+			Event event = AdapterFactory.createEvent();
+			event.addAttribute(AdapterFactory.createAttribute(
+					LONG_ATTRIBUTE_NAME,
+					AdapterFactory.createAttributeValue(value, Long.class)));
 			events.add(event);
 
 			value = value >= maxValue ? minValue : value + 1;
@@ -176,10 +189,10 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 	 * LESS_THAN_MIN_VALUE and LESS_THAN_MAX_VALUE
 	 */
 	public void timeMatchLessThanOneEvent_25(int reps) {
-		Event event = new Event();
-		event.addAttribute(new Attribute<Long>(LONG_ATTRIBUTE_NAME,
-				new AttributeValue<Long>(LESS_THAN_ONE_EVENT_MATCH_25_VALUE,
-						Long.class)));
+		Event event = AdapterFactory.createEvent();
+		event.addAttribute(AdapterFactory.createAttribute(LONG_ATTRIBUTE_NAME,
+				AdapterFactory.createAttributeValue(
+						LESS_THAN_ONE_EVENT_MATCH_25_VALUE, Long.class)));
 
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
@@ -194,10 +207,10 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 	 * GREATER_THAN_OR_EQUAL_MAX_VALUE)
 	 */
 	public void timeMatchGreaterThanOrEqualOneEvent_25(int reps) {
-		Event event = new Event();
-		event.addAttribute(new Attribute<Long>(LONG_ATTRIBUTE_NAME,
-				new AttributeValue<Long>(GREATER_THAN_ONE_EVENT_MATCH_25_VALUE,
-						Long.class)));
+		Event event = AdapterFactory.createEvent();
+		event.addAttribute(AdapterFactory.createAttribute(LONG_ATTRIBUTE_NAME,
+				AdapterFactory.createAttributeValue(
+						GREATER_THAN_ONE_EVENT_MATCH_25_VALUE, Long.class)));
 
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
@@ -233,9 +246,10 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 	}
 
 	public void timeMatchOneEvent_50(int reps) {
-		Event event = new Event();
-		event.addAttribute(new Attribute<Long>(LONG_ATTRIBUTE_NAME,
-				new AttributeValue<Long>(MATCH_50_VALUE, Long.class)));
+		Event event = AdapterFactory.createEvent();
+		event.addAttribute(AdapterFactory
+				.createAttribute(LONG_ATTRIBUTE_NAME, AdapterFactory
+						.createAttributeValue(MATCH_50_VALUE, Long.class)));
 
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
@@ -253,9 +267,10 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 	}
 
 	public void timeMatchOneEvent_75(int reps) {
-		Event event = new Event();
-		event.addAttribute(new Attribute<Long>(LONG_ATTRIBUTE_NAME,
-				new AttributeValue<Long>(MATCH_75_VALUE, Long.class)));
+		Event event = AdapterFactory.createEvent();
+		event.addAttribute(AdapterFactory
+				.createAttribute(LONG_ATTRIBUTE_NAME, AdapterFactory
+						.createAttributeValue(MATCH_75_VALUE, Long.class)));
 
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
@@ -273,9 +288,10 @@ public class OneAttributeOperatorsLessThanAndGreaterThanOrEqual extends
 	}
 
 	public void timeMatchOneEvent_100(int reps) {
-		Event event = new Event();
-		event.addAttribute(new Attribute<Long>(LONG_ATTRIBUTE_NAME,
-				new AttributeValue<Long>(MATCH_100_VALUE, Long.class)));
+		Event event = AdapterFactory.createEvent();
+		event.addAttribute(AdapterFactory.createAttribute(LONG_ATTRIBUTE_NAME,
+				AdapterFactory
+						.createAttributeValue(MATCH_100_VALUE, Long.class)));
 
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
