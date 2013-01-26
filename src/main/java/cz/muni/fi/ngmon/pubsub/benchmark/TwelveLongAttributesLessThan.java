@@ -1,5 +1,19 @@
 package cz.muni.fi.ngmon.pubsub.benchmark;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import com.google.caliper.SimpleBenchmark;
 
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.AdapterFactory;
@@ -17,6 +31,8 @@ import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.PublishSubscribeTree
  */
 public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 
+	private static final String RANDOM_FILE_NAME = "random.txt";
+
 	private static final int ATTRIBUTE_VALUES_COUNT = 10000;
 	private static final String LONG_ATTRIBUTE_NAME_PREFIX = "longAttribute";
 	private static final int ATTRIBUTE_COUNT = 12;
@@ -32,6 +48,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 	private static final int EVENT_COUNT = 100;
 
 	private PublishSubscribeTree tree;
+	private PublishSubscribeTree randomTree;
 	private Event matchingEvent;
 	private Event notMatchingEvent1;
 	private Event notMatchingEvent2;
@@ -46,31 +63,48 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 	private Event matchingEvent50_2;
 	private Event matchingEvent75_2;
 
+	private Constraint<Long> getConstraint(int attributeIndex, long val) {
+		return AdapterFactory.createConstraint(
+				LONG_ATTRIBUTE_NAME_PREFIX + attributeIndex,
+				AdapterFactory.createAttributeValue(attributeIndex * 10000
+						+ val, Long.class), Operator.LESS_THAN);
+	}
+
+	public void setUpPublic() throws Exception {
+		setUp();
+	}
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
 		this.tree = AdapterFactory.createPublishSubscribeTree();
+		this.randomTree = AdapterFactory.createPublishSubscribeTree();
 
+		List<Long> randomValues = getRandomValuesFromFile();
+		Iterator<Long> randomIterator = randomValues.iterator();
 		long val = MIN_VALUE;
+		long randomVal = randomIterator.next();
 		for (int i = 0; i < PREDICATE_COUNT; i++) {
 
 			Filter filter = AdapterFactory.createFilter();
+			Filter randomFilter = AdapterFactory.createFilter();
 			for (int j = 0; j < ATTRIBUTE_COUNT; j++) {
-				Constraint<Long> constraint = AdapterFactory.createConstraint(
-						LONG_ATTRIBUTE_NAME_PREFIX + j, AdapterFactory
-								.createAttributeValue(j * 10000 + val,
-										Long.class), Operator.LESS_THAN);
-				filter.addConstraint(constraint);
+				filter.addConstraint(getConstraint(j, val));
+				randomFilter.addConstraint(getConstraint(j, randomVal));
 			}
 
 			Predicate predicate = AdapterFactory.createPredicate();
 			predicate.addFilter(filter);
+			Predicate randomPredicate = AdapterFactory.createPredicate();
+			randomPredicate.addFilter(randomFilter);
 
 			tree.subscribe(predicate);
+			randomTree.subscribe(randomPredicate);
 
 			val = val >= MAX_VALUE ? MIN_VALUE : val + 1;
-
+			if (i + 1 < PREDICATE_COUNT)
+				randomVal = randomIterator.next();
 		}
 
 		matchingEvent = AdapterFactory.createEvent();
@@ -157,71 +191,118 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 		}
 	}
 
-//	public void timeMatchAverage_25(int reps) {
-//		for (int i = 0; i < reps; i++) {
-//			for (int j = 0; j < EVENT_COUNT / 4; j++) {
-//				tree.match(matchingEvent);
-//				tree.match(notMatchingEvent1);
-//				tree.match(notMatchingEvent1);
-//				tree.match(notMatchingEvent1);
-//			}
-//		}
-//	}
-//
-//	public void timeMatchAverage2_25(int reps) {
-//		for (int i = 0; i < reps; i++) {
-//			for (int j = 0; j < EVENT_COUNT / 4; j++) {
-//				tree.match(matchingEvent);
-//				tree.match(notMatchingEvent2);
-//				tree.match(notMatchingEvent2);
-//				tree.match(notMatchingEvent2);
-//			}
-//		}
-//	}
-//
-//	public void timeMatchAverage_50(int reps) {
-//		for (int i = 0; i < reps; i++) {
-//			for (int j = 0; j < EVENT_COUNT / 4; j++) {
-//				tree.match(matchingEvent);
-//				tree.match(matchingEvent);
-//				tree.match(notMatchingEvent1);
-//				tree.match(notMatchingEvent1);
-//			}
-//		}
-//	}
-//
-//	public void timeMatchAverage2_50(int reps) {
-//		for (int i = 0; i < reps; i++) {
-//			for (int j = 0; j < EVENT_COUNT / 4; j++) {
-//				tree.match(matchingEvent);
-//				tree.match(matchingEvent);
-//				tree.match(notMatchingEvent2);
-//				tree.match(notMatchingEvent2);
-//			}
-//		}
-//	}
-//
-//	public void timeMatchAverage_75(int reps) {
-//		for (int i = 0; i < reps; i++) {
-//			for (int j = 0; j < EVENT_COUNT / 4; j++) {
-//				tree.match(matchingEvent);
-//				tree.match(matchingEvent);
-//				tree.match(matchingEvent);
-//				tree.match(notMatchingEvent1);
-//			}
-//		}
-//	}
-//
-//	public void timeMatchAverage2_75(int reps) {
-//		for (int i = 0; i < reps; i++) {
-//			for (int j = 0; j < EVENT_COUNT / 4; j++) {
-//				tree.match(matchingEvent);
-//				tree.match(matchingEvent);
-//				tree.match(matchingEvent);
-//				tree.match(notMatchingEvent2);
-//			}
-//		}
-//	}
+	public static void createFileWithRandomValues() throws IOException {
+		long val = MIN_VALUE;
+		List<Long> values = new ArrayList<>(PREDICATE_COUNT);
+		for (int i = 0; i < PREDICATE_COUNT; i++) {
+			values.add(val);
+			val = val >= MAX_VALUE ? MIN_VALUE : val + 1;
+		}
+		Collections.shuffle(values);
+
+		FileOutputStream fstream = new FileOutputStream(RANDOM_FILE_NAME);
+		DataOutputStream out = new DataOutputStream(fstream);
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
+		for (Long value : values) {
+			bw.write(value.toString());
+			bw.write("\n");
+		}
+		bw.close();
+	}
+
+	private List<Long> getValuesFromFile() throws NumberFormatException,
+			IOException {
+		List<Long> values = new ArrayList<>(PREDICATE_COUNT);
+		FileInputStream fstream = new FileInputStream(RANDOM_FILE_NAME);
+		DataInputStream in = new DataInputStream(fstream);
+		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		String strLine;
+		while ((strLine = br.readLine()) != null) {
+			values.add(Long.parseLong(strLine));
+		}
+		br.close();
+		return values;
+	}
+
+	private List<Long> getRandomValuesFromFile() throws NumberFormatException,
+			IOException {
+		List<Long> values = getValuesFromFile();
+		if (values.size() != PREDICATE_COUNT) {
+			createFileWithRandomValues();
+			values = getValuesFromFile();
+			if (values.size() != PREDICATE_COUNT) {
+				throw new RuntimeException();
+			}
+		}
+
+		return values;
+	}
+
+	// public void timeMatchAverage_25(int reps) {
+	// for (int i = 0; i < reps; i++) {
+	// for (int j = 0; j < EVENT_COUNT / 4; j++) {
+	// tree.match(matchingEvent);
+	// tree.match(notMatchingEvent1);
+	// tree.match(notMatchingEvent1);
+	// tree.match(notMatchingEvent1);
+	// }
+	// }
+	// }
+	//
+	// public void timeMatchAverage2_25(int reps) {
+	// for (int i = 0; i < reps; i++) {
+	// for (int j = 0; j < EVENT_COUNT / 4; j++) {
+	// tree.match(matchingEvent);
+	// tree.match(notMatchingEvent2);
+	// tree.match(notMatchingEvent2);
+	// tree.match(notMatchingEvent2);
+	// }
+	// }
+	// }
+	//
+	// public void timeMatchAverage_50(int reps) {
+	// for (int i = 0; i < reps; i++) {
+	// for (int j = 0; j < EVENT_COUNT / 4; j++) {
+	// tree.match(matchingEvent);
+	// tree.match(matchingEvent);
+	// tree.match(notMatchingEvent1);
+	// tree.match(notMatchingEvent1);
+	// }
+	// }
+	// }
+	//
+	// public void timeMatchAverage2_50(int reps) {
+	// for (int i = 0; i < reps; i++) {
+	// for (int j = 0; j < EVENT_COUNT / 4; j++) {
+	// tree.match(matchingEvent);
+	// tree.match(matchingEvent);
+	// tree.match(notMatchingEvent2);
+	// tree.match(notMatchingEvent2);
+	// }
+	// }
+	// }
+	//
+	// public void timeMatchAverage_75(int reps) {
+	// for (int i = 0; i < reps; i++) {
+	// for (int j = 0; j < EVENT_COUNT / 4; j++) {
+	// tree.match(matchingEvent);
+	// tree.match(matchingEvent);
+	// tree.match(matchingEvent);
+	// tree.match(notMatchingEvent1);
+	// }
+	// }
+	// }
+	//
+	// public void timeMatchAverage2_75(int reps) {
+	// for (int i = 0; i < reps; i++) {
+	// for (int j = 0; j < EVENT_COUNT / 4; j++) {
+	// tree.match(matchingEvent);
+	// tree.match(matchingEvent);
+	// tree.match(matchingEvent);
+	// tree.match(notMatchingEvent2);
+	// }
+	// }
+	// }
 
 	public void timeMatch_100(int reps) {
 		for (int i = 0; i < reps; i++) {
@@ -238,11 +319,27 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 			}
 		}
 	}
+	
+	public void timeMatch_25_random(int reps) {
+		for (int i = 0; i < reps; i++) {
+			for (int j = 0; j < EVENT_COUNT; j++) {
+				randomTree.match(matchingEvent25);
+			}
+		}
+	}
 
 	public void timeMatch_50(int reps) {
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
 				tree.match(matchingEvent50);
+			}
+		}
+	}
+	
+	public void timeMatch_50_random(int reps) {
+		for (int i = 0; i < reps; i++) {
+			for (int j = 0; j < EVENT_COUNT; j++) {
+				randomTree.match(matchingEvent50);
 			}
 		}
 	}
@@ -254,11 +351,27 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 			}
 		}
 	}
+	
+	public void timeMatch_75_random(int reps) {
+		for (int i = 0; i < reps; i++) {
+			for (int j = 0; j < EVENT_COUNT; j++) {
+				randomTree.match(matchingEvent75);
+			}
+		}
+	}
 
 	public void timeMatch2_25(int reps) {
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
 				tree.match(matchingEvent25_2);
+			}
+		}
+	}
+	
+	public void timeMatch2_25_random(int reps) {
+		for (int i = 0; i < reps; i++) {
+			for (int j = 0; j < EVENT_COUNT; j++) {
+				randomTree.match(matchingEvent25_2);
 			}
 		}
 	}
@@ -270,11 +383,27 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 			}
 		}
 	}
+	
+	public void timeMatch2_50_random(int reps) {
+		for (int i = 0; i < reps; i++) {
+			for (int j = 0; j < EVENT_COUNT; j++) {
+				randomTree.match(matchingEvent50_2);
+			}
+		}
+	}
 
 	public void timeMatch2_75(int reps) {
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
 				tree.match(matchingEvent75_2);
+			}
+		}
+	}
+	
+	public void timeMatch2_75_random(int reps) {
+		for (int i = 0; i < reps; i++) {
+			for (int j = 0; j < EVENT_COUNT; j++) {
+				randomTree.match(matchingEvent75_2);
 			}
 		}
 	}
