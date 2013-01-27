@@ -41,6 +41,8 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 	private static final long ALWAYS_MATCHING_VALUE = 0L;
 	private static final long NEVER_MATCHING_VALUE = 100000000L;
 
+	private static final int SUBSCRIBE_CALLS = 1000;
+
 	// must be smaller (or much bigger) than MAX_VALUE - MIN_VALUE, otherwise
 	// timeMatch_*_real() benchmarks might not match the required ratio of the
 	// Predicates
@@ -319,7 +321,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 			}
 		}
 	}
-	
+
 	public void timeMatch_25_random(int reps) {
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
@@ -335,7 +337,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 			}
 		}
 	}
-	
+
 	public void timeMatch_50_random(int reps) {
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
@@ -351,7 +353,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 			}
 		}
 	}
-	
+
 	public void timeMatch_75_random(int reps) {
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
@@ -367,7 +369,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 			}
 		}
 	}
-	
+
 	public void timeMatch2_25_random(int reps) {
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
@@ -383,7 +385,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 			}
 		}
 	}
-	
+
 	public void timeMatch2_50_random(int reps) {
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
@@ -399,13 +401,67 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 			}
 		}
 	}
-	
+
 	public void timeMatch2_75_random(int reps) {
 		for (int i = 0; i < reps; i++) {
 			for (int j = 0; j < EVENT_COUNT; j++) {
 				randomTree.match(matchingEvent75_2);
 			}
 		}
+	}
+
+	// This method doesn't use Caliper, since I don't know how
+	// to customize the reps count to limit the number of subscribe()
+	// calls and get the correct results
+	
+	/**
+	 * Subscribe benchmark
+	 * @param subscribeToRandomTree If the "tree" with randomly ordered
+	 * 								predicates should be used
+	 * @throws Exception
+	 */
+	public void subscribeBenchmark(boolean subscribeToRandomTree)
+			throws Exception {
+		setUp();
+
+		// prepare the predicates first
+
+		List<Predicate> predicates = new ArrayList<>(SUBSCRIBE_CALLS);
+		long val1 = MIN_VALUE;
+		long val2 = MAX_VALUE;
+		for (int i = 0; i < SUBSCRIBE_CALLS / 2; i++) {
+			Filter filter1 = AdapterFactory.createFilter();
+			Filter filter2 = AdapterFactory.createFilter();
+			for (int j = 0; j < ATTRIBUTE_COUNT; j++, val1++, val2++) {
+				filter1.addConstraint(getConstraint(j, val1));
+				filter2.addConstraint(getConstraint(j, val2));
+			}
+
+			Predicate predicate1 = AdapterFactory.createPredicate();
+			predicate1.addFilter(filter1);
+			Predicate predicate2 = AdapterFactory.createPredicate();
+			predicate2.addFilter(filter2);
+
+			predicates.add(predicate1);
+			predicates.add(predicate2);
+		}
+
+		long timeBeg = System.nanoTime();
+
+		for (Predicate predicate : predicates) {
+			if (subscribeToRandomTree)
+				randomTree.subscribe(predicate);
+			else
+				tree.subscribe(predicate);
+		}
+
+		long timeEnd = System.nanoTime();
+		long timeDiff = timeEnd - timeBeg;
+
+		System.out.println(SUBSCRIBE_CALLS + " subscribe() calls took: ");
+		System.out.println(UtilityMethods.getTime(timeDiff));
+		System.out.println("One subscribe() call took on average: ");
+		System.out.println(UtilityMethods.getTime(timeDiff / SUBSCRIBE_CALLS));
 	}
 
 }
