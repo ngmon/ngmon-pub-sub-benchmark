@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.caliper.Param;
 import com.google.caliper.SimpleBenchmark;
 
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.AdapterFactory;
@@ -46,8 +47,8 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 	// must be smaller (or much bigger) than MAX_VALUE - MIN_VALUE, otherwise
 	// timeMatch_*_real() benchmarks might not match the required ratio of the
 	// Predicates
-	private static final int PREDICATE_COUNT = 1000;
-	private static final int EVENT_COUNT = 100;
+	@Param int PREDICATE_COUNT;
+	@Param int EVENT_COUNT;
 
 	private PublishSubscribeTree tree;
 	private PublishSubscribeTree randomTree;
@@ -193,7 +194,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 		}
 	}
 
-	public static void createFileWithRandomValues() throws IOException {
+	public void createFileWithRandomValues() throws IOException {
 		long val = MIN_VALUE;
 		List<Long> values = new ArrayList<>(PREDICATE_COUNT);
 		for (int i = 0; i < PREDICATE_COUNT; i++) {
