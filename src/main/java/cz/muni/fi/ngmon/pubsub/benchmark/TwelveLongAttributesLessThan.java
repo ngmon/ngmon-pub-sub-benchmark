@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,7 +33,8 @@ import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.PublishSubscribeTree
  */
 public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 
-	private static final String RANDOM_FILE_NAME = "random.txt";
+	private static final String RANDOM_FILE_NAME = "random";
+	private static final String RANDOM_FILE_EXT = "txt";
 
 	private static final int ATTRIBUTE_VALUES_COUNT = 10000;
 	private static final String LONG_ATTRIBUTE_NAME_PREFIX = "longAttribute";
@@ -47,8 +49,10 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 	// must be smaller (or much bigger) than MAX_VALUE - MIN_VALUE, otherwise
 	// timeMatch_*_real() benchmarks might not match the required ratio of the
 	// Predicates
-	@Param int PREDICATE_COUNT;
-	@Param int EVENT_COUNT;
+	@Param
+	int PREDICATE_COUNT;
+	@Param
+	int EVENT_COUNT;
 
 	private PublishSubscribeTree tree;
 	private PublishSubscribeTree randomTree;
@@ -194,6 +198,11 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 		}
 	}
 
+	private String getRandomFileName() {
+		return RANDOM_FILE_NAME + "-" + String.valueOf(PREDICATE_COUNT) + "."
+				+ RANDOM_FILE_EXT;
+	}
+
 	public void createFileWithRandomValues() throws IOException {
 		long val = MIN_VALUE;
 		List<Long> values = new ArrayList<>(PREDICATE_COUNT);
@@ -203,7 +212,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 		}
 		Collections.shuffle(values);
 
-		FileOutputStream fstream = new FileOutputStream(RANDOM_FILE_NAME);
+		FileOutputStream fstream = new FileOutputStream(getRandomFileName());
 		DataOutputStream out = new DataOutputStream(fstream);
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out));
 		for (Long value : values) {
@@ -216,7 +225,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 	private List<Long> getValuesFromFile() throws NumberFormatException,
 			IOException {
 		List<Long> values = new ArrayList<>(PREDICATE_COUNT);
-		FileInputStream fstream = new FileInputStream(RANDOM_FILE_NAME);
+		FileInputStream fstream = new FileInputStream(getRandomFileName());
 		DataInputStream in = new DataInputStream(fstream);
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		String strLine;
@@ -229,7 +238,11 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 
 	private List<Long> getRandomValuesFromFile() throws NumberFormatException,
 			IOException {
-		List<Long> values = getValuesFromFile();
+		List<Long> values = new ArrayList<>();
+		try {
+			values = getValuesFromFile();
+		} catch (FileNotFoundException e) {
+		}
 		if (values.size() != PREDICATE_COUNT) {
 			createFileWithRandomValues();
 			values = getValuesFromFile();
@@ -414,11 +427,12 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 	// This method doesn't use Caliper, since I don't know how
 	// to customize the reps count to limit the number of subscribe()
 	// calls and get the correct results
-	
+
 	/**
 	 * Subscribe benchmark
-	 * @param subscribeToRandomTree If the "tree" with randomly ordered
-	 * 								predicates should be used
+	 * 
+	 * @param subscribeToRandomTree
+	 *            If the "tree" with randomly ordered predicates should be used
 	 * @throws Exception
 	 */
 	public void subscribeBenchmark(boolean subscribeToRandomTree)
