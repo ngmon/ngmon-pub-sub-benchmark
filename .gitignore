@@ -17,3 +17,6 @@
 */target
 /reports
 */reports
+
+*.*~
+random-*.txt
