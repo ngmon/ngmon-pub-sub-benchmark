@@ -7,8 +7,7 @@ Installing Siena to local Maven repo:
 
 2. Add pom.xml with groupId "siena" and artifactId "siena" to the siena directory. For example:
 
-(open this file as "raw" to see it as intended)
-
+```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -40,6 +39,7 @@ Installing Siena to local Maven repo:
 		</plugins>
 	</build>
 </project>
+```
 
 3. Move src/siena directory to src/main/java/siena.
 
