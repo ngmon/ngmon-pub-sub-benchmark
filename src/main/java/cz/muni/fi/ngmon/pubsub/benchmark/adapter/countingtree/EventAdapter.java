@@ -5,7 +5,7 @@ import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Attribute;
 import cz.muni.fi.ngmon.pubsub.benchmark.adapter.interfaces.Event;
 
 public class EventAdapter extends
-		cz.muni.fi.publishsubscribe.countingtree.Event implements Event {
+		cz.muni.fi.publishsubscribe.countingtree.EventImpl implements Event {
 
 	@Override
 	public void addAttribute(Attribute<? extends Comparable<?>> attribute) {
