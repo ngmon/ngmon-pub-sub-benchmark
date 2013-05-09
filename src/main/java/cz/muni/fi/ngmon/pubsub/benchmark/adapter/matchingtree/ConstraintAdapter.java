@@ -13,7 +13,7 @@ import cz.muni.fi.publishsubscribe.matchingtree.TestResult;
 public class ConstraintAdapter<T1 extends Comparable<T1>> implements
 		Constraint<T1> {
 
-	private Predicate<? extends Comparable<?>, ? extends Comparable<?>> predicate = null;
+	private Predicate<? extends Comparable, ? extends Comparable> predicate = null;
 
 	private ComparisonResult operatorToComparisonResult(Operator operator) {
 		switch (operator) {
@@ -71,7 +71,7 @@ public class ConstraintAdapter<T1 extends Comparable<T1>> implements
 	}
 
 	@Override
-	public Predicate<? extends Comparable<?>, ? extends Comparable<?>> getMatchingTreePredicate() {
+	public Predicate<? extends Comparable, ? extends Comparable> getMatchingTreePredicate() {
 		return predicate;
 	}
 
