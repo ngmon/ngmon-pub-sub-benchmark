@@ -57,7 +57,16 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 	private PublishSubscribeTree tree;
 	private PublishSubscribeTree randomTree;
 	private Event matchingEvent;
+	/**
+	 * This event is matched by almost all (11/12) constraints, but it's not
+	 * matched by any filter and thus not matched by any predicate (because
+	 * the last event attribute has too large a value to be matched)
+	 */
 	private Event notMatchingEvent1;
+	/**
+	 * This event is matched by no constraints/filters/predicates
+	 * (the event attributes have too large values)
+	 */
 	private Event notMatchingEvent2;
 
 	private Event matchingEvent25;
@@ -73,7 +82,7 @@ public class TwelveLongAttributesLessThan extends SimpleBenchmark {
 	private Constraint<Long> getConstraint(int attributeIndex, long val) {
 		return AdapterFactory.createConstraint(
 				LONG_ATTRIBUTE_NAME_PREFIX + attributeIndex,
-				AdapterFactory.createAttributeValue(attributeIndex * 10000
+				AdapterFactory.createAttributeValue(attributeIndex * ATTRIBUTE_VALUES_COUNT
 						+ val, Long.class), Operator.LESS_THAN);
 	}
 
