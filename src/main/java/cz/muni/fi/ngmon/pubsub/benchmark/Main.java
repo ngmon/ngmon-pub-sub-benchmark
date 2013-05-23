@@ -4,6 +4,10 @@ import com.google.caliper.Runner;
 
 public class Main {
 
+	private static final String JSTACK = "-Jstack=-Xss2m";
+	private static final String JMEMORY_MIN = "-JmemoryMin=-Xms8m";
+	private static final String JMEMORY_MAX = "-JmemoryMax=-Xmx256m";
+
 	public static void main(String[] args) throws Exception {
 
 		// System.out.println("test1");
@@ -17,7 +21,7 @@ public class Main {
 		// com.google.caliper.Runner.main
 		runner.run(new String[] {
 				"cz.muni.fi.ngmon.pubsub.benchmark.TwelveLongAttributesLessThan",
-				"-DPREDICATE_COUNT=1000", "-DEVENT_COUNT=1000" });
+				"-DPREDICATE_COUNT=1000", "-DEVENT_COUNT=1000", JMEMORY_MAX, JMEMORY_MIN, JSTACK });
 
 		System.out.println();
 		System.out.println("1000");
@@ -25,7 +29,7 @@ public class Main {
 
 		runner.run(new String[] {
 				"cz.muni.fi.ngmon.pubsub.benchmark.TwelveLongAttributesLessThan",
-				"-DPREDICATE_COUNT=1000", "-DEVENT_COUNT=100" });
+				"-DPREDICATE_COUNT=1000", "-DEVENT_COUNT=100", JMEMORY_MAX, JMEMORY_MIN, JSTACK });
 		
 		System.out.println();
 		System.out.println("2000");
@@ -33,15 +37,15 @@ public class Main {
 
 		runner.run(new String[] {
 				"cz.muni.fi.ngmon.pubsub.benchmark.TwelveLongAttributesLessThan",
-				"-DPREDICATE_COUNT=2000", "-DEVENT_COUNT=100" });
+				"-DPREDICATE_COUNT=2000", "-DEVENT_COUNT=100", JMEMORY_MAX, JMEMORY_MIN, JSTACK });*/
 		
-		System.out.println();
+		/*-System.out.println();
 		System.out.println("4000");
 		System.out.println("100");*/
-
+		
 		runner.run(new String[] {
 				"cz.muni.fi.ngmon.pubsub.benchmark.TwelveLongAttributesLessThan",
-				"-DPREDICATE_COUNT=4000", "-DEVENT_COUNT=100" });
+				"-DPREDICATE_COUNT=4000", "-DEVENT_COUNT=100", JMEMORY_MAX, JMEMORY_MIN, JSTACK });
 
 		/*-com.google.caliper.Runner
 				.main(new String[] {
